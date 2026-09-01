@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: 'postgis/postgis:17-3.5'
+    environment:
+      POSTGRES_DB: dlrm
+      POSTGRES_USER: dlrm
+      POSTGRES_PASSWORD: dlrm
+    ports:
+      - '5432:5432'
+    volumes:
+      - dlrm-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  dlrm-postgres-data:

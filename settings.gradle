@@ -1,0 +1,10 @@
+plugins {
+	// JDK 21 없으면 Gradle이 자동 설치
+	id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'dlrm'
+
+include 'core'
+include 'service'
+include 'admin'

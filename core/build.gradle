@@ -1,0 +1,19 @@
+plugins {
+	id 'java-library'
+	id 'java-test-fixtures'
+}
+
+dependencies {
+	api 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	implementation 'org.springframework.boot:spring-boot-flyway'
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+
+	testFixturesApi 'org.springframework.boot:spring-boot-test'
+	testFixturesApi 'org.springframework.boot:spring-boot-testcontainers'
+	testFixturesApi 'org.testcontainers:testcontainers-junit-jupiter'
+	testFixturesApi 'org.testcontainers:testcontainers-postgresql'
+}
