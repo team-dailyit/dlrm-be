@@ -39,6 +39,7 @@ subprojects {
 	}
 
 	spotless {
+		ratchetFrom 'origin/develop'
 		java {
 			target 'src/**/*.java'
 			googleJavaFormat()
