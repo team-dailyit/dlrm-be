@@ -1,6 +1,9 @@
 services:
   postgres:
     image: 'postgis/postgis:17-3.5'
+    labels:
+      # postgis 이미지는 Spring Boot가 postgres로 자동 인식하지 못해 직접 지정
+      org.springframework.boot.service-connection: postgres
     environment:
       POSTGRES_DB: dlrm
       POSTGRES_USER: dlrm
