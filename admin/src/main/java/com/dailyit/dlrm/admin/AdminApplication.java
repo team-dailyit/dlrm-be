@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("com.dailyit.dlrm.core.repository")
 public class AdminApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(AdminApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(AdminApplication.class, args);
+    }
 }

@@ -10,12 +10,12 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration(proxyBeanMethods = false)
 public class PostgresTestContainer {
 
-  private static final DockerImageName IMAGE =
-      DockerImageName.parse("postgis/postgis:17-3.5").asCompatibleSubstituteFor("postgres");
+    private static final DockerImageName IMAGE =
+            DockerImageName.parse("postgis/postgis:17-3.5").asCompatibleSubstituteFor("postgres");
 
-  @Bean
-  @ServiceConnection
-  PostgreSQLContainer postgresContainer() {
-    return new PostgreSQLContainer(IMAGE);
-  }
+    @Bean
+    @ServiceConnection
+    PostgreSQLContainer postgresContainer() {
+        return new PostgreSQLContainer(IMAGE);
+    }
 }
