@@ -34,3 +34,13 @@ public class PlaceNotFoundException extends BaseException {
     }
 }
 ```
+
+## 테스트
+
+- 테스트 메서드 이름은 영어 camelCase로 짓고, 무엇을 검증하는지는 `@DisplayName`에 한글 문장으로 적는다.
+
+```java
+@Test
+@DisplayName("없는 주소로 요청하면 404를 응답한다")
+void notFound() throws Exception { ... }
+```
