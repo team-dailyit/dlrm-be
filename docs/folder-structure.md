@@ -12,8 +12,9 @@ Gradle 멀티모듈 프로젝트로, `core` / `service` / `admin` 세 모듈로 
 
 ## core 패키지 구조
 
-- `config`: 공통 설정 및 빈 (전역 예외 처리, 공통 응답 포맷 등)
+- `config`: 공통 설정 및 빈 (전역 예외 처리 `GlobalExceptionHandler`, 에러 응답 포맷 `ErrorResponse` 등)
 - `domain`: JPA 엔티티
+- `exception`: 에러 코드와 예외 타입 (`ErrorCode`, `CommonErrorCode`, `BaseException`). 에러를 "정의"하는 곳이고, 이를 응답으로 "변환"하는 건 `config`의 전역 핸들러가 맡는다.
 - `repository`: Spring Data JPA 레포지토리
 
 ## core 리소스·테스트 지원
@@ -37,6 +38,7 @@ dlrm/
 │       ├── main/java/com/dailyit/dlrm/core/
 │       │   ├── config/       # 공통 설정 및 빈
 │       │   ├── domain/       # JPA 엔티티
+│       │   ├── exception/    # 에러 코드, 예외 타입
 │       │   └── repository/   # Spring Data JPA 레포지토리
 │       ├── main/resources/db/migration/                     # Flyway 마이그레이션
 │       └── testFixtures/java/com/dailyit/dlrm/core/testsupport/  # 공통 테스트 지원
