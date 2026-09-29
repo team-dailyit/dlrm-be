@@ -24,8 +24,9 @@ Gradle 멀티모듈 프로젝트로, `core` / `service` / `admin` 세 모듈로 
 
 ## service / admin 패키지 구조
 
+- `config`: 모듈 전용 설정 및 빈 (스웨거 설정 등)
+
 <!--
-  아직 확정 안 됨. 현재는 각 모듈에 Spring Boot 진입점(`ServiceApplication`, `AdminApplication`)만 있는 상태.
   Controller/Service 등 세부 패키지 컨벤션은 개발하면서 점차 채울 예정.
 -->
 
@@ -44,8 +45,10 @@ dlrm/
 │       └── testFixtures/java/com/dailyit/dlrm/core/testsupport/  # 공통 테스트 지원
 ├── service/
 │   └── src/main/java/com/dailyit/dlrm/service/
+│       ├── config/       # 모듈 전용 설정 및 빈
 │       └── ServiceApplication.java
 └── admin/
     └── src/main/java/com/dailyit/dlrm/admin/
+        ├── config/       # 모듈 전용 설정 및 빈
         └── AdminApplication.java
 ```
