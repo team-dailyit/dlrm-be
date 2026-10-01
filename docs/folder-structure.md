@@ -26,8 +26,12 @@ Gradle 멀티모듈 프로젝트로, `core` / `service` / `admin` 세 모듈로 
 
 - `config`: 모듈 전용 설정 및 빈 (스웨거 설정 등)
 
+### service
+
+- 기능별 패키지(예: `category`)를 만들고, 그 기능의 Controller, Service, 요청·응답 DTO를 함께 둔다.
+
 <!--
-  Controller/Service 등 세부 패키지 컨벤션은 개발하면서 점차 채울 예정.
+  admin 세부 패키지 컨벤션은 개발하면서 점차 채울 예정.
 -->
 
 ## 디렉토리 트리
@@ -46,6 +50,7 @@ dlrm/
 ├── service/
 │   └── src/main/java/com/dailyit/dlrm/service/
 │       ├── config/       # 모듈 전용 설정 및 빈
+│       ├── category/     # 기능별 패키지 (Controller, Service, DTO)
 │       └── ServiceApplication.java
 └── admin/
     └── src/main/java/com/dailyit/dlrm/admin/
