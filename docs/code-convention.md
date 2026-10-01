@@ -17,6 +17,11 @@ public record NearbyPlaceQuery(
 public List<PlaceResponse> getPlaces(@ParameterObject NearbyPlaceQuery query) { ... }
 ```
 
+## API 응답
+
+- 엔티티를 그대로 반환하지 않고, `record` DTO로 변환해 반환한다.
+- 목록 조회는 정렬 기준을 명시한다.
+
 ## 에러 처리
 
 - 에러는 예외를 던져서 처리한다. Controller에서 try-catch로 에러 응답을 직접 만들지 않는다.
@@ -51,6 +56,18 @@ public class PlaceNotFoundException extends BaseException {
     }
 }
 ```
+
+## 엔티티
+
+- `BaseEntity`를 상속한다.
+- `@Setter`, `@Data`를 쓰지 않는다.
+- 기본 생성자는 `@NoArgsConstructor(access = AccessLevel.PROTECTED)`로 막는다.
+
+## DB 마이그레이션
+
+- 테이블 이름은 복수형 snake_case로 쓴다. (예: `categories`)
+- develop에 머지된 마이그레이션 파일은 수정하지 않고, 새 버전 파일로 변경한다.
+- 데이터 `INSERT`는 넣지 않는다. 데이터는 admin에서 입력한다.
 
 ## 테스트
 
