@@ -46,7 +46,8 @@ class CategoryControllerTest {
                         .iconUrl("https://example.com/icons/prop-shop.png")
                         .build());
 
-        // PostgreSQL은 수정된 행을 테이블 뒤쪽에 새로 쓰므로, 정렬 없이 조회하면 "전시"가 마지막에 나온다
+        // 정렬 없이도 우연히 id 순으로 나오지 않도록 "전시"를 수정해 저장 위치를 뒤로 보낸다
+        // (PostgreSQL은 수정된 행을 테이블 뒤쪽에 새로 쓰므로, 정렬하지 않으면 "전시"가 마지막에 나온다)
         exhibition.update("전시", "https://example.com/icons/exhibition-v2.png");
         categoryRepository.saveAndFlush(exhibition);
 
@@ -56,7 +57,7 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$[0].name").value("전시"))
                 .andExpect(jsonPath("$[1].name").value("팝업"))
                 .andExpect(jsonPath("$[2].name").value("소품샵"))
-                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(exhibition.getId()))
                 .andExpect(
                         jsonPath("$[0].icon_url")
                                 .value("https://example.com/icons/exhibition-v2.png"));
