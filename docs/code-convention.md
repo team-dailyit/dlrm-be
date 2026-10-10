@@ -62,10 +62,12 @@ public class PlaceNotFoundException extends BaseException {
 - `BaseEntity`를 상속한다.
 - `@Setter`, `@Data`를 쓰지 않는다.
 - 기본 생성자는 `@NoArgsConstructor(access = AccessLevel.PROTECTED)`로 막는다.
+- enum 필드는 `@Enumerated(EnumType.STRING)`으로 매핑한다.
 
 ## DB 마이그레이션
 
 - 테이블 이름은 복수형 snake_case로 쓴다. (예: `categories`)
+- enum 값을 저장하는 컬럼은 PostgreSQL ENUM 타입 대신 `VARCHAR` + `CHECK (컬럼 IN (...))`로 만든다.
 - develop에 머지된 마이그레이션 파일은 수정하지 않고, 새 버전 파일로 변경한다.
 - 데이터 `INSERT`는 넣지 않는다. 데이터는 admin에서 입력한다.
 
