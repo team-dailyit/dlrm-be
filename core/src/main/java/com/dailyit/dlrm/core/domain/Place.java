@@ -43,6 +43,10 @@ public class Place extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "neighborhood_id", nullable = false)
+    private Neighborhood neighborhood;
+
     @Column(nullable = false, length = 100)
     private String name;
 
@@ -91,6 +95,7 @@ public class Place extends BaseEntity {
     @Builder
     private Place(
             Category category,
+            Neighborhood neighborhood,
             String name,
             String thumbnailUrl,
             String address,
@@ -104,6 +109,7 @@ public class Place extends BaseEntity {
             PlaceStatus status,
             StatusChangeType statusChangeType) {
         this.category = category;
+        this.neighborhood = neighborhood;
         this.name = name;
         this.thumbnailUrl = thumbnailUrl;
         this.address = address;

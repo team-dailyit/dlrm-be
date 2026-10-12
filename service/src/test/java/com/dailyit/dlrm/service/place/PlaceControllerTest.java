@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.dailyit.dlrm.core.domain.Category;
 import com.dailyit.dlrm.core.domain.Keyword;
+import com.dailyit.dlrm.core.domain.Neighborhood;
 import com.dailyit.dlrm.core.domain.OperatingHour;
 import com.dailyit.dlrm.core.domain.Place;
 import com.dailyit.dlrm.core.domain.type.DayOfWeekCode;
@@ -19,6 +20,7 @@ import com.dailyit.dlrm.core.domain.type.ScheduleType;
 import com.dailyit.dlrm.core.domain.type.StatusChangeType;
 import com.dailyit.dlrm.core.repository.CategoryRepository;
 import com.dailyit.dlrm.core.repository.KeywordRepository;
+import com.dailyit.dlrm.core.repository.NeighborhoodRepository;
 import com.dailyit.dlrm.core.repository.PlaceRepository;
 import com.dailyit.dlrm.core.testsupport.PostgresTestContainer;
 import jakarta.persistence.EntityManager;
@@ -46,6 +48,8 @@ class PlaceControllerTest {
     @Autowired PlaceRepository placeRepository;
 
     @Autowired CategoryRepository categoryRepository;
+
+    @Autowired NeighborhoodRepository neighborhoodRepository;
 
     @Autowired KeywordRepository keywordRepository;
 
@@ -189,8 +193,17 @@ class PlaceControllerTest {
                                 .name("팝업")
                                 .iconUrl("https://example.com/icons/popup.png")
                                 .build());
+        Neighborhood neighborhood =
+                neighborhoodRepository.save(
+                        Neighborhood.builder()
+                                .stationName("성수")
+                                .lat(new BigDecimal("37.5446"))
+                                .lng(new BigDecimal("127.0559"))
+                                .build());
+
         return Place.builder()
                 .category(category)
+                .neighborhood(neighborhood)
                 .name("슈퍼마리오 스페셜 팝업")
                 .thumbnailUrl("https://example.com/places/mario.png")
                 .address("서울 성동구 연무장7길 1")
