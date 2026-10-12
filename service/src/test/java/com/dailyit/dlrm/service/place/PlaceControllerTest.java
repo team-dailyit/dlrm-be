@@ -22,6 +22,7 @@ import com.dailyit.dlrm.core.repository.CategoryRepository;
 import com.dailyit.dlrm.core.repository.KeywordRepository;
 import com.dailyit.dlrm.core.repository.NeighborhoodRepository;
 import com.dailyit.dlrm.core.repository.PlaceRepository;
+import com.dailyit.dlrm.core.testsupport.FixedClockTestConfig;
 import com.dailyit.dlrm.core.testsupport.PostgresTestContainer;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
@@ -37,7 +38,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@Import(PostgresTestContainer.class)
+@Import({PostgresTestContainer.class, FixedClockTestConfig.class})
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -97,6 +98,7 @@ class PlaceControllerTest {
                 .andExpect(jsonPath("$.lat").value(37.5445))
                 .andExpect(jsonPath("$.lng").value(127.0559))
                 .andExpect(jsonPath("$.sns_url").value("https://instagram.com/mario"))
+                .andExpect(jsonPath("$.is_open_now").value(true))
                 .andExpect(jsonPath("$.homepage_url").value(nullValue()))
                 .andExpect(jsonPath("$.category_id").value(place.getCategory().getId()))
                 // 운영 시간
@@ -159,6 +161,28 @@ class PlaceControllerTest {
                         jsonPath("$.operating_hours[5:].open_time").value(everyItem(nullValue())))
                 .andExpect(
                         jsonPath("$.operating_hours[5:].close_time").value(everyItem(nullValue())));
+    }
+
+    @Test
+    @DisplayName("지금 영업 중이 아니면 is_open_now를 false로 응답한다")
+    void notOpenNow() throws Exception {
+        Place place = buildPlace(PlaceStatus.ACTIVE);
+        // 지금(화요일 15:00)보다 일찍 마감
+        place.addOperatingHour(
+                OperatingHour.builder()
+                        .dayOfWeek(DayOfWeekCode.TUE)
+                        .isDayOff(false)
+                        .openTime(LocalTime.of(9, 0))
+                        .closeTime(LocalTime.of(13, 0))
+                        .build());
+        placeRepository.save(place);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(get("/places/{id}", place.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.is_open_now").value(false));
     }
 
     @Test
