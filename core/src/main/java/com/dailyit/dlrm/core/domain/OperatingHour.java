@@ -37,7 +37,7 @@ public class OperatingHour extends BaseEntity {
     private DayOfWeekCode dayOfWeek;
 
     @Column(nullable = false)
-    private boolean isOpen;
+    private boolean isDayOff;
 
     private LocalTime openTime;
 
@@ -45,9 +45,9 @@ public class OperatingHour extends BaseEntity {
 
     @Builder
     private OperatingHour(
-            DayOfWeekCode dayOfWeek, boolean isOpen, LocalTime openTime, LocalTime closeTime) {
+            DayOfWeekCode dayOfWeek, boolean isDayOff, LocalTime openTime, LocalTime closeTime) {
         this.dayOfWeek = dayOfWeek;
-        this.isOpen = isOpen;
+        this.isDayOff = isDayOff;
         this.openTime = openTime;
         this.closeTime = closeTime;
     }

@@ -7,19 +7,19 @@ import java.time.LocalTime;
 
 public record OperatingHourResponse(
         DayOfWeekCode dayOfWeek,
-        boolean isOpen,
+        boolean isDayOff,
         @JsonFormat(pattern = "HH:mm") LocalTime openTime,
         @JsonFormat(pattern = "HH:mm") LocalTime closeTime) {
 
     public static OperatingHourResponse from(OperatingHour operatingHour) {
         return new OperatingHourResponse(
                 operatingHour.getDayOfWeek(),
-                operatingHour.isOpen(),
+                operatingHour.isDayOff(),
                 operatingHour.getOpenTime(),
                 operatingHour.getCloseTime());
     }
 
     public static OperatingHourResponse closed(DayOfWeekCode dayOfWeek) {
-        return new OperatingHourResponse(dayOfWeek, false, null, null);
+        return new OperatingHourResponse(dayOfWeek, true, null, null);
     }
 }
