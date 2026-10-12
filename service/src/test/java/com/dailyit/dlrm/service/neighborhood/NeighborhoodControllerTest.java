@@ -15,45 +15,26 @@ import com.dailyit.dlrm.core.domain.type.StatusChangeType;
 import com.dailyit.dlrm.core.repository.CategoryRepository;
 import com.dailyit.dlrm.core.repository.NeighborhoodRepository;
 import com.dailyit.dlrm.core.repository.PlaceRepository;
+import com.dailyit.dlrm.core.testsupport.FixedClockTestConfig;
 import com.dailyit.dlrm.core.testsupport.PostgresTestContainer;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@Import(PostgresTestContainer.class)
+@Import({PostgresTestContainer.class, FixedClockTestConfig.class})
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class NeighborhoodControllerTest {
-
-    // 2026-10-13(화) 15:00 KST
-    static final LocalDateTime NOW = LocalDateTime.of(2026, 10, 13, 15, 0);
-
-    @TestConfiguration
-    static class FixedClockConfig {
-
-        @Bean
-        @Primary
-        Clock fixedClock() {
-            ZoneId zone = ZoneId.of("Asia/Seoul");
-            return Clock.fixed(NOW.atZone(zone).toInstant(), zone);
-        }
-    }
 
     @Autowired MockMvc mockMvc;
 

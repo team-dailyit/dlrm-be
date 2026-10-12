@@ -5,6 +5,7 @@ import com.dailyit.dlrm.core.domain.OperatingHour;
 import com.dailyit.dlrm.core.domain.Place;
 import com.dailyit.dlrm.core.domain.type.DayOfWeekCode;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -21,11 +22,12 @@ public record PlaceDetailResponse(
         BigDecimal lng,
         String address,
         List<OperatingHourResponse> operatingHours,
+        boolean isOpenNow,
         String snsUrl,
         String homepageUrl,
         List<KeywordResponse> keywords) {
 
-    public static PlaceDetailResponse from(Place place) {
+    public static PlaceDetailResponse from(Place place, LocalDateTime now) {
         return new PlaceDetailResponse(
                 place.getId(),
                 place.getName(),
@@ -35,6 +37,7 @@ public record PlaceDetailResponse(
                 place.getLng(),
                 place.getAddress(),
                 toOperatingHours(place.getOperatingHours()),
+                place.isOpenAt(now),
                 place.getSnsUrl(),
                 place.getHomepageUrl(),
                 place.getKeywords().stream()
