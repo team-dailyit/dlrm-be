@@ -55,4 +55,31 @@ public class OperatingHour extends BaseEntity {
     void assignPlace(Place place) {
         this.place = place;
     }
+
+    // 이 요일 당일(00:00~24:00) 중 영업 구간인지 판단한다.
+    public boolean isOpenSameDayAt(LocalTime time) {
+        if (isDayOff) {
+            return false;
+        }
+        if (isAllDay()) {
+            return true;
+        }
+        if (isOvernight()) {
+            return !time.isBefore(openTime);
+        }
+        return !time.isBefore(openTime) && time.isBefore(closeTime);
+    }
+
+    // 이 요일에 시작한 영업이 자정을 넘겨, 다음날 해당 시각까지 이어지는지 판단한다.
+    public boolean isOpenNextDayAt(LocalTime time) {
+        return !isDayOff && isOvernight() && time.isBefore(closeTime);
+    }
+
+    private boolean isAllDay() {
+        return openTime.equals(LocalTime.MIDNIGHT) && closeTime.equals(LocalTime.MIDNIGHT);
+    }
+
+    private boolean isOvernight() {
+        return closeTime.isBefore(openTime);
+    }
 }

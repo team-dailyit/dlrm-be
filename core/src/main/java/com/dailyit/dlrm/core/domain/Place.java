@@ -1,5 +1,6 @@
 package com.dailyit.dlrm.core.domain;
 
+import com.dailyit.dlrm.core.domain.type.DayOfWeekCode;
 import com.dailyit.dlrm.core.domain.type.PlaceStatus;
 import com.dailyit.dlrm.core.domain.type.ScheduleType;
 import com.dailyit.dlrm.core.domain.type.StatusChangeType;
@@ -20,9 +21,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -127,5 +131,24 @@ public class Place extends BaseEntity {
     public void addOperatingHour(OperatingHour operatingHour) {
         operatingHours.add(operatingHour);
         operatingHour.assignPlace(this);
+    }
+
+    public boolean isOpenAt(LocalDateTime dateTime) {
+        LocalTime time = dateTime.toLocalTime();
+        DayOfWeekCode today = DayOfWeekCode.from(dateTime.getDayOfWeek());
+        DayOfWeekCode yesterday = DayOfWeekCode.from(dateTime.getDayOfWeek().minus(1));
+
+        return findOperatingHour(today)
+                        .map(operatingHour -> operatingHour.isOpenSameDayAt(time))
+                        .orElse(false)
+                || findOperatingHour(yesterday)
+                        .map(operatingHour -> operatingHour.isOpenNextDayAt(time))
+                        .orElse(false);
+    }
+
+    private Optional<OperatingHour> findOperatingHour(DayOfWeekCode dayOfWeek) {
+        return operatingHours.stream()
+                .filter(operatingHour -> operatingHour.getDayOfWeek() == dayOfWeek)
+                .findFirst();
     }
 }
