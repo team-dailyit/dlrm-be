@@ -48,27 +48,6 @@ class PlaceControllerTest {
 
     @Autowired EntityManager entityManager;
 
-    private Place buildPlace(PlaceStatus status) {
-        Category category =
-                categoryRepository.save(
-                        Category.builder()
-                                .name("팝업")
-                                .iconUrl("https://example.com/icons/popup.png")
-                                .build());
-        return Place.builder()
-                .category(category)
-                .name("슈퍼마리오 스페셜 팝업")
-                .thumbnailUrl("https://example.com/places/mario.png")
-                .address("서울 성동구 연무장7길 1")
-                .lat(new BigDecimal("37.5445"))
-                .lng(new BigDecimal("127.0559"))
-                .snsUrl("https://instagram.com/mario")
-                .scheduleType(ScheduleType.ALWAYS)
-                .status(status)
-                .statusChangeType(StatusChangeType.MANUAL)
-                .build();
-    }
-
     @Test
     @DisplayName("장소 상세 정보를 응답한다")
     void getPlaceDetail() throws Exception {
@@ -202,5 +181,26 @@ class PlaceControllerTest {
         mockMvc.perform(get("/places/{id}", place.getId()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("PLACE_NOT_FOUND"));
+    }
+
+    private Place buildPlace(PlaceStatus status) {
+        Category category =
+                categoryRepository.save(
+                        Category.builder()
+                                .name("팝업")
+                                .iconUrl("https://example.com/icons/popup.png")
+                                .build());
+        return Place.builder()
+                .category(category)
+                .name("슈퍼마리오 스페셜 팝업")
+                .thumbnailUrl("https://example.com/places/mario.png")
+                .address("서울 성동구 연무장7길 1")
+                .lat(new BigDecimal("37.5445"))
+                .lng(new BigDecimal("127.0559"))
+                .snsUrl("https://instagram.com/mario")
+                .scheduleType(ScheduleType.ALWAYS)
+                .status(status)
+                .statusChangeType(StatusChangeType.MANUAL)
+                .build();
     }
 }
