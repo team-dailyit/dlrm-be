@@ -60,12 +60,12 @@ class PlaceControllerTest {
         for (DayOfWeekCode day : DayOfWeekCode.values()) {
             if (day == DayOfWeekCode.MON) {
                 place.addOperatingHour(
-                        OperatingHour.builder().dayOfWeek(day).isOpen(false).build());
+                        OperatingHour.builder().dayOfWeek(day).isDayOff(true).build());
             } else {
                 place.addOperatingHour(
                         OperatingHour.builder()
                                 .dayOfWeek(day)
-                                .isOpen(true)
+                                .isDayOff(false)
                                 .openTime(LocalTime.of(9, 0))
                                 .closeTime(LocalTime.of(22, 0))
                                 .build());
@@ -95,11 +95,11 @@ class PlaceControllerTest {
                 // 운영 시간
                 .andExpect(jsonPath("$.operating_hours.length()").value(7))
                 .andExpect(jsonPath("$.operating_hours[0].day_of_week").value("MON"))
-                .andExpect(jsonPath("$.operating_hours[0].is_open").value(false))
+                .andExpect(jsonPath("$.operating_hours[0].is_day_off").value(true))
                 .andExpect(jsonPath("$.operating_hours[0].open_time").value(nullValue()))
                 .andExpect(jsonPath("$.operating_hours[0].close_time").value(nullValue()))
                 .andExpect(jsonPath("$.operating_hours[1].day_of_week").value("TUE"))
-                .andExpect(jsonPath("$.operating_hours[1].is_open").value(true))
+                .andExpect(jsonPath("$.operating_hours[1].is_day_off").value(false))
                 .andExpect(jsonPath("$.operating_hours[1].open_time").value("09:00"))
                 .andExpect(jsonPath("$.operating_hours[1].close_time").value("22:00"))
                 // 키워드
@@ -123,7 +123,7 @@ class PlaceControllerTest {
             place.addOperatingHour(
                     OperatingHour.builder()
                             .dayOfWeek(day)
-                            .isOpen(true)
+                            .isDayOff(false)
                             .openTime(LocalTime.of(9, 0))
                             .closeTime(LocalTime.of(22, 0))
                             .build());
@@ -138,22 +138,22 @@ class PlaceControllerTest {
                 .andExpect(jsonPath("$.operating_hours", hasSize(7)))
                 // 월~금
                 .andExpect(jsonPath("$.operating_hours[0].day_of_week").value("MON"))
-                .andExpect(jsonPath("$.operating_hours[0].is_open").value(true))
+                .andExpect(jsonPath("$.operating_hours[0].is_day_off").value(false))
                 .andExpect(jsonPath("$.operating_hours[1].day_of_week").value("TUE"))
-                .andExpect(jsonPath("$.operating_hours[1].is_open").value(true))
+                .andExpect(jsonPath("$.operating_hours[1].is_day_off").value(false))
                 .andExpect(jsonPath("$.operating_hours[2].day_of_week").value("WED"))
-                .andExpect(jsonPath("$.operating_hours[2].is_open").value(true))
+                .andExpect(jsonPath("$.operating_hours[2].is_day_off").value(false))
                 .andExpect(jsonPath("$.operating_hours[3].day_of_week").value("THU"))
-                .andExpect(jsonPath("$.operating_hours[3].is_open").value(true))
+                .andExpect(jsonPath("$.operating_hours[3].is_day_off").value(false))
                 .andExpect(jsonPath("$.operating_hours[4].day_of_week").value("FRI"))
-                .andExpect(jsonPath("$.operating_hours[4].is_open").value(true))
+                .andExpect(jsonPath("$.operating_hours[4].is_day_off").value(false))
                 // 토~일
                 .andExpect(jsonPath("$.operating_hours[5].day_of_week").value("SAT"))
-                .andExpect(jsonPath("$.operating_hours[5].is_open").value(false))
+                .andExpect(jsonPath("$.operating_hours[5].is_day_off").value(true))
                 .andExpect(jsonPath("$.operating_hours[5].open_time").value(nullValue()))
                 .andExpect(jsonPath("$.operating_hours[5].close_time").value(nullValue()))
                 .andExpect(jsonPath("$.operating_hours[6].day_of_week").value("SUN"))
-                .andExpect(jsonPath("$.operating_hours[6].is_open").value(false))
+                .andExpect(jsonPath("$.operating_hours[6].is_day_off").value(true))
                 .andExpect(jsonPath("$.operating_hours[6].open_time").value(nullValue()))
                 .andExpect(jsonPath("$.operating_hours[6].close_time").value(nullValue()));
     }
