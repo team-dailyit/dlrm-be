@@ -16,7 +16,7 @@ Gradle 멀티모듈 프로젝트로, `core` / `service` / `admin` 세 모듈로 
 - `domain`: JPA 엔티티
     - `type`: 엔티티 필드에 쓰는 enum
 - `exception`: 에러 코드와 예외 타입 (`ErrorCode`, `CommonErrorCode`, `BaseException`). 에러를 "정의"하는 곳이고, 이를 응답으로 "변환"하는 건 `config`의 전역 핸들러가 맡는다.
-- `repository`: Spring Data JPA 레포지토리
+- `repository`: Spring Data JPA 레포지토리와 조회 결과 프로젝션 (`PlaceDistance` 등)
 
 ## core 리소스·테스트 지원
 
@@ -46,7 +46,7 @@ dlrm/
 │       │   ├── domain/       # JPA 엔티티
 │       │   │   └── type/     # 엔티티 필드용 enum
 │       │   ├── exception/    # 에러 코드, 예외 타입
-│       │   └── repository/   # Spring Data JPA 레포지토리
+│       │   └── repository/   # Spring Data JPA 레포지토리, 조회 결과 프로젝션
 │       ├── main/resources/db/migration/                     # Flyway 마이그레이션
 │       └── testFixtures/java/com/dailyit/dlrm/core/testsupport/  # 공통 테스트 지원
 ├── service/
