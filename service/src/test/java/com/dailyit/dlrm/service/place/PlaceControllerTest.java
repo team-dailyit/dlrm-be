@@ -1,6 +1,9 @@
 package com.dailyit.dlrm.service.place;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,20 +97,25 @@ class PlaceControllerTest {
                 .andExpect(jsonPath("$.category_id").value(place.getCategory().getId()))
                 // 운영 시간
                 .andExpect(jsonPath("$.operating_hours.length()").value(7))
-                .andExpect(jsonPath("$.operating_hours[0].day_of_week").value("MON"))
-                .andExpect(jsonPath("$.operating_hours[0].is_day_off").value(true))
+                .andExpect(
+                        jsonPath("$.operating_hours[*].day_of_week")
+                                .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
+                .andExpect(
+                        jsonPath("$.operating_hours[*].is_day_off")
+                                .value(contains(true, false, false, false, false, false, false)))
+                // 월
                 .andExpect(jsonPath("$.operating_hours[0].open_time").value(nullValue()))
                 .andExpect(jsonPath("$.operating_hours[0].close_time").value(nullValue()))
-                .andExpect(jsonPath("$.operating_hours[1].day_of_week").value("TUE"))
-                .andExpect(jsonPath("$.operating_hours[1].is_day_off").value(false))
-                .andExpect(jsonPath("$.operating_hours[1].open_time").value("09:00"))
-                .andExpect(jsonPath("$.operating_hours[1].close_time").value("22:00"))
+                // 화~일
+                .andExpect(
+                        jsonPath("$.operating_hours[1:].open_time").value(everyItem(is("09:00"))))
+                .andExpect(
+                        jsonPath("$.operating_hours[1:].close_time").value(everyItem(is("22:00"))))
                 // 키워드
                 .andExpect(jsonPath("$.keywords.length()").value(2))
                 .andExpect(jsonPath("$.keywords[0].id").value(family.getId()))
-                .andExpect(jsonPath("$.keywords[0].name").value("가족과함께"))
                 .andExpect(jsonPath("$.keywords[1].id").value(popup.getId()))
-                .andExpect(jsonPath("$.keywords[1].name").value("팝업스토어"));
+                .andExpect(jsonPath("$.keywords[*].name").value(contains("가족과함께", "팝업스토어")));
     }
 
     @Test
@@ -136,26 +144,17 @@ class PlaceControllerTest {
         mockMvc.perform(get("/places/{id}", place.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.operating_hours", hasSize(7)))
-                // 월~금
-                .andExpect(jsonPath("$.operating_hours[0].day_of_week").value("MON"))
-                .andExpect(jsonPath("$.operating_hours[0].is_day_off").value(false))
-                .andExpect(jsonPath("$.operating_hours[1].day_of_week").value("TUE"))
-                .andExpect(jsonPath("$.operating_hours[1].is_day_off").value(false))
-                .andExpect(jsonPath("$.operating_hours[2].day_of_week").value("WED"))
-                .andExpect(jsonPath("$.operating_hours[2].is_day_off").value(false))
-                .andExpect(jsonPath("$.operating_hours[3].day_of_week").value("THU"))
-                .andExpect(jsonPath("$.operating_hours[3].is_day_off").value(false))
-                .andExpect(jsonPath("$.operating_hours[4].day_of_week").value("FRI"))
-                .andExpect(jsonPath("$.operating_hours[4].is_day_off").value(false))
+                .andExpect(
+                        jsonPath("$.operating_hours[*].day_of_week")
+                                .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
+                .andExpect(
+                        jsonPath("$.operating_hours[*].is_day_off")
+                                .value(contains(false, false, false, false, false, true, true)))
                 // 토~일
-                .andExpect(jsonPath("$.operating_hours[5].day_of_week").value("SAT"))
-                .andExpect(jsonPath("$.operating_hours[5].is_day_off").value(true))
-                .andExpect(jsonPath("$.operating_hours[5].open_time").value(nullValue()))
-                .andExpect(jsonPath("$.operating_hours[5].close_time").value(nullValue()))
-                .andExpect(jsonPath("$.operating_hours[6].day_of_week").value("SUN"))
-                .andExpect(jsonPath("$.operating_hours[6].is_day_off").value(true))
-                .andExpect(jsonPath("$.operating_hours[6].open_time").value(nullValue()))
-                .andExpect(jsonPath("$.operating_hours[6].close_time").value(nullValue()));
+                .andExpect(
+                        jsonPath("$.operating_hours[5:].open_time").value(everyItem(nullValue())))
+                .andExpect(
+                        jsonPath("$.operating_hours[5:].close_time").value(everyItem(nullValue())));
     }
 
     @Test
