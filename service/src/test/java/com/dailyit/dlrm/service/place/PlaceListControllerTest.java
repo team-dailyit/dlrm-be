@@ -65,7 +65,7 @@ class PlaceListControllerTest {
                 categoryRepository.save(
                         Category.builder()
                                 .name("팝업")
-                                .iconUrl("https://example.com/icons/popup.png")
+                                .iconUrl("https://dlrm.test/icons/popup.png")
                                 .build());
         neighborhood =
                 neighborhoodRepository.save(
@@ -175,7 +175,7 @@ class PlaceListControllerTest {
                 .andExpect(jsonPath("$.places[0].name").value("가까운 장소"))
                 .andExpect(
                         jsonPath("$.places[0].thumbnail_url")
-                                .value("https://example.com/places/example.png"))
+                                .value("https://dlrm.test/places/popup.png"))
                 .andExpect(jsonPath("$.places[0].category_id").value(category.getId()))
                 .andExpect(jsonPath("$.places[0].lat").value(37.5445))
                 .andExpect(jsonPath("$.places[0].lng").value(127.0569))
@@ -237,11 +237,11 @@ class PlaceListControllerTest {
                 .category(category)
                 .neighborhood(neighborhood)
                 .name(name)
-                .thumbnailUrl("https://example.com/places/example.png")
-                .address("서울 성동구 연무장7길 1")
+                .thumbnailUrl("https://dlrm.test/places/popup.png")
+                .address("서울시 영등포구 당산로")
                 .lat(new BigDecimal(LAT))
                 .lng(new BigDecimal(lng))
-                .snsUrl("https://instagram.com/example")
+                .snsUrl("https://instagram.com/dlrm_popup")
                 .scheduleType(ScheduleType.ALWAYS)
                 .status(status)
                 .statusChangeType(StatusChangeType.MANUAL)
