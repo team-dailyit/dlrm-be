@@ -91,13 +91,12 @@ class PlaceControllerTest {
                 .andExpect(status().isOk())
                 // 기본 필드
                 .andExpect(jsonPath("$.id").value(place.getId()))
-                .andExpect(jsonPath("$.name").value("슈퍼마리오 스페셜 팝업"))
-                .andExpect(
-                        jsonPath("$.thumbnail_url").value("https://example.com/places/mario.png"))
-                .andExpect(jsonPath("$.address").value("서울 성동구 연무장7길 1"))
+                .andExpect(jsonPath("$.name").value("들름 팝업스토어"))
+                .andExpect(jsonPath("$.thumbnail_url").value("https://dlrm.test/places/popup.png"))
+                .andExpect(jsonPath("$.address").value("서울시 영등포구 당산로"))
                 .andExpect(jsonPath("$.lat").value(37.5445))
                 .andExpect(jsonPath("$.lng").value(127.0559))
-                .andExpect(jsonPath("$.sns_url").value("https://instagram.com/mario"))
+                .andExpect(jsonPath("$.sns_url").value("https://instagram.com/dlrm_popup"))
                 .andExpect(jsonPath("$.is_open_now").value(true))
                 .andExpect(jsonPath("$.homepage_url").value(nullValue()))
                 .andExpect(jsonPath("$.category_id").value(place.getCategory().getId()))
@@ -215,7 +214,7 @@ class PlaceControllerTest {
                 categoryRepository.save(
                         Category.builder()
                                 .name("팝업")
-                                .iconUrl("https://example.com/icons/popup.png")
+                                .iconUrl("https://dlrm.test/icons/popup.png")
                                 .build());
         Neighborhood neighborhood =
                 neighborhoodRepository.save(
@@ -228,12 +227,12 @@ class PlaceControllerTest {
         return Place.builder()
                 .category(category)
                 .neighborhood(neighborhood)
-                .name("슈퍼마리오 스페셜 팝업")
-                .thumbnailUrl("https://example.com/places/mario.png")
-                .address("서울 성동구 연무장7길 1")
+                .name("들름 팝업스토어")
+                .thumbnailUrl("https://dlrm.test/places/popup.png")
+                .address("서울시 영등포구 당산로")
                 .lat(new BigDecimal("37.5445"))
                 .lng(new BigDecimal("127.0559"))
-                .snsUrl("https://instagram.com/mario")
+                .snsUrl("https://instagram.com/dlrm_popup")
                 .scheduleType(ScheduleType.ALWAYS)
                 .status(status)
                 .statusChangeType(StatusChangeType.MANUAL)

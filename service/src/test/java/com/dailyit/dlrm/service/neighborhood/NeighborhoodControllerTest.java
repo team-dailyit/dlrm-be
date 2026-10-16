@@ -54,7 +54,7 @@ class NeighborhoodControllerTest {
                 categoryRepository.save(
                         Category.builder()
                                 .name("팝업")
-                                .iconUrl("https://example.com/icons/popup.png")
+                                .iconUrl("https://dlrm.test/icons/popup.png")
                                 .build());
     }
 
@@ -159,9 +159,9 @@ class NeighborhoodControllerTest {
                 Place.builder()
                         .category(category)
                         .neighborhood(neighborhood)
-                        .name("슈퍼마리오 스페셜 팝업")
-                        .thumbnailUrl("https://example.com/places/mario.png")
-                        .address("서울 성동구 연무장7길 1")
+                        .name("들름 팝업스토어")
+                        .thumbnailUrl("https://dlrm.test/places/popup.png")
+                        .address("서울시 영등포구 당산로")
                         .lat(neighborhood.getLat())
                         .lng(neighborhood.getLng())
                         .scheduleType(ScheduleType.ALWAYS)
