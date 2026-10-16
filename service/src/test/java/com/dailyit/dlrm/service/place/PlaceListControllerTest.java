@@ -1,5 +1,6 @@
 package com.dailyit.dlrm.service.place;
 
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -186,14 +187,14 @@ class PlaceListControllerTest {
                 // 영업 정보 (지금: 화요일 15:00)
                 .andExpect(jsonPath("$.places[0].is_open_now").value(true))
                 .andExpect(jsonPath("$.places[0].operating_hours.length()").value(7))
-                .andExpect(jsonPath("$.places[0].operating_hours[0].day_of_week").value("MON"))
-                .andExpect(jsonPath("$.places[0].operating_hours[0].is_day_off").value(true))
-                .andExpect(jsonPath("$.places[0].operating_hours[1].day_of_week").value("TUE"))
-                .andExpect(jsonPath("$.places[0].operating_hours[1].is_day_off").value(false))
+                .andExpect(
+                        jsonPath("$.places[0].operating_hours[*].day_of_week")
+                                .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
+                .andExpect(
+                        jsonPath("$.places[0].operating_hours[*].is_day_off")
+                                .value(contains(true, false, true, true, true, true, true)))
                 .andExpect(jsonPath("$.places[0].operating_hours[1].open_time").value("09:00"))
-                .andExpect(jsonPath("$.places[0].operating_hours[1].close_time").value("22:00"))
-                .andExpect(jsonPath("$.places[0].operating_hours[6].day_of_week").value("SUN"))
-                .andExpect(jsonPath("$.places[0].operating_hours[6].is_day_off").value(true));
+                .andExpect(jsonPath("$.places[0].operating_hours[1].close_time").value("22:00"));
     }
 
     @Test
