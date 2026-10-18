@@ -239,7 +239,7 @@ class PlaceListControllerTest {
                 .neighborhood(neighborhood)
                 .name(name)
                 .thumbnailUrl("https://dlrm.test/places/popup.png")
-                .address("서울시 영등포구 당산로")
+                .address("서울시 성동구 성수이로")
                 .lat(new BigDecimal(LAT))
                 .lng(new BigDecimal(lng))
                 .snsUrl("https://instagram.com/dlrm_popup")
