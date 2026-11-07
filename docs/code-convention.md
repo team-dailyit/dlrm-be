@@ -22,6 +22,24 @@ public List<PlaceResponse> getPlaces(@ParameterObject NearbyPlaceQuery query) { 
 - 엔티티를 그대로 반환하지 않고, `record` DTO로 변환해 반환한다.
 - 목록 조회는 정렬 기준을 명시한다.
 
+## API 문서 (Swagger)
+
+- 개발 전 설계는 노션 API 명세에, 개발 후 기준 문서는 Swagger에 둔다. API가 바뀌면 Swagger를 고친다.
+- 모든 API에 `@Operation(summary = ...)`를 붙인다. summary만으로 부족한 규칙은 `description`에 적는다.
+- 모든 응답 필드에 `@Schema(description = ..., example = ...)`를, 모든 요청 파라미터에 `@Parameter(description = ..., example = ...)`를 붙인다.
+    - 목록·중첩 객체 필드는 `example`을 생략한다. (하위 DTO의 예시로 자동 생성된다)
+- 특수 규칙(null이 되는 조건, 단위, 기준 시간, 특수 값)이 있으면 `description`에 함께 적는다.
+- API에서 발생할 수 있는 에러 응답을 `@ApiResponse`로 적는다.
+
+```java
+public record OperatingHourResponse(
+        @Schema(description = "요일", example = "MON") DayOfWeekCode dayOfWeek,
+        // LocalTime은 "HH:mm" 문자열로 응답하므로 type = "string"을 지정한다
+        @Schema(description = "마감 시각(HH:mm). 오픈 시각보다 이르면 다음날 마감", type = "string", example = "02:00")
+                @JsonFormat(pattern = "HH:mm")
+                LocalTime closeTime) {}
+```
+
 ## 에러 처리
 
 - 에러는 예외를 던져서 처리한다. Controller에서 try-catch로 에러 응답을 직접 만들지 않는다.

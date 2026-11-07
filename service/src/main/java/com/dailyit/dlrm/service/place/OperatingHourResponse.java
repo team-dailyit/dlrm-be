@@ -3,6 +3,7 @@ package com.dailyit.dlrm.service.place;
 import com.dailyit.dlrm.core.domain.OperatingHour;
 import com.dailyit.dlrm.core.domain.type.DayOfWeekCode;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
@@ -11,10 +12,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public record OperatingHourResponse(
-        DayOfWeekCode dayOfWeek,
-        boolean isDayOff,
-        @JsonFormat(pattern = "HH:mm") LocalTime openTime,
-        @JsonFormat(pattern = "HH:mm") LocalTime closeTime) {
+        @Schema(description = "요일", example = "MON") DayOfWeekCode dayOfWeek,
+        @Schema(description = "true면 휴무일. 영업시간이 등록되지 않은 요일도 휴무일로 응답한다", example = "false")
+                boolean isDayOff,
+        @Schema(description = "오픈 시각(HH:mm). 휴무일이면 null", type = "string", example = "18:00")
+                @JsonFormat(pattern = "HH:mm")
+                LocalTime openTime,
+        @Schema(
+                        description =
+                                "마감 시각(HH:mm). 휴무일이면 null. 오픈 시각보다 이르면 다음날 마감이고,"
+                                        + " 오픈·마감이 모두 00:00이면 24시간 영업",
+                        type = "string",
+                        example = "02:00")
+                @JsonFormat(pattern = "HH:mm")
+                LocalTime closeTime) {
 
     public static OperatingHourResponse from(OperatingHour operatingHour) {
         return new OperatingHourResponse(

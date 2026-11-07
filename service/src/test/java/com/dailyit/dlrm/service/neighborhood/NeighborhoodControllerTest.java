@@ -161,7 +161,7 @@ class NeighborhoodControllerTest {
                         .neighborhood(neighborhood)
                         .name("들름 팝업스토어")
                         .thumbnailUrl("https://dlrm.test/places/popup.png")
-                        .address("서울시 영등포구 당산로")
+                        .address("서울시 성동구 성수이로")
                         .lat(neighborhood.getLat())
                         .lng(neighborhood.getLng())
                         .scheduleType(ScheduleType.ALWAYS)
