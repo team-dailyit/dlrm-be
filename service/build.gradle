@@ -13,3 +13,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation(testFixtures(project(':core')))
 }
+
+// 실행할 수 없는 plain jar가 bootJar와 함께 생기지 않게 한다
+tasks.named('jar') {
+	enabled = false
+}
