@@ -56,7 +56,7 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$[2].name").value("소품샵"))
                 .andExpect(jsonPath("$[0].id").value(exhibition.getId()))
                 .andExpect(
-                        jsonPath("$[0].icon_url")
+                        jsonPath("$[0].iconUrl")
                                 .value("https://dlrm.test/icons/exhibition-v2.png"));
     }
 

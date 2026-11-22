@@ -91,9 +91,9 @@ class PlaceListControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.places.length()").value(2))
                 .andExpect(jsonPath("$.places[0].name").value("가까운 장소"))
-                .andExpect(jsonPath("$.places[0].distance_m").value(88))
+                .andExpect(jsonPath("$.places[0].distanceM").value(88))
                 .andExpect(jsonPath("$.places[1].name").value("먼 장소"))
-                .andExpect(jsonPath("$.places[1].distance_m").value(398));
+                .andExpect(jsonPath("$.places[1].distanceM").value(398));
     }
 
     @Test
@@ -106,10 +106,10 @@ class PlaceListControllerTest {
 
         mockMvc.perform(
                         get("/places")
-                                .param("neighborhood_id", String.valueOf(neighborhood.getId())))
+                                .param("neighborhoodId", String.valueOf(neighborhood.getId())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.places.length()").value(1))
-                .andExpect(jsonPath("$.places[0].distance_m").value(88));
+                .andExpect(jsonPath("$.places[0].distanceM").value(88));
     }
 
     @Test
@@ -175,26 +175,26 @@ class PlaceListControllerTest {
                 .andExpect(jsonPath("$.places[0].id").value(place.getId()))
                 .andExpect(jsonPath("$.places[0].name").value("가까운 장소"))
                 .andExpect(
-                        jsonPath("$.places[0].thumbnail_url")
+                        jsonPath("$.places[0].thumbnailUrl")
                                 .value("https://dlrm.test/places/popup.png"))
-                .andExpect(jsonPath("$.places[0].category_id").value(category.getId()))
+                .andExpect(jsonPath("$.places[0].categoryId").value(category.getId()))
                 .andExpect(jsonPath("$.places[0].lat").value(37.5445))
                 .andExpect(jsonPath("$.places[0].lng").value(127.0569))
-                .andExpect(jsonPath("$.places[0].distance_m").value(88))
+                .andExpect(jsonPath("$.places[0].distanceM").value(88))
                 // 목록에서 뺀 필드
-                .andExpect(jsonPath("$.places[0].schedule_type").doesNotExist())
-                .andExpect(jsonPath("$.places[0].end_date").doesNotExist())
+                .andExpect(jsonPath("$.places[0].scheduleType").doesNotExist())
+                .andExpect(jsonPath("$.places[0].endDate").doesNotExist())
                 // 영업 정보 (지금: 화요일 15:00)
-                .andExpect(jsonPath("$.places[0].is_open_now").value(true))
-                .andExpect(jsonPath("$.places[0].operating_hours.length()").value(7))
+                .andExpect(jsonPath("$.places[0].isOpenNow").value(true))
+                .andExpect(jsonPath("$.places[0].operatingHours.length()").value(7))
                 .andExpect(
-                        jsonPath("$.places[0].operating_hours[*].day_of_week")
+                        jsonPath("$.places[0].operatingHours[*].dayOfWeek")
                                 .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
                 .andExpect(
-                        jsonPath("$.places[0].operating_hours[*].is_day_off")
+                        jsonPath("$.places[0].operatingHours[*].isDayOff")
                                 .value(contains(true, false, true, true, true, true, true)))
-                .andExpect(jsonPath("$.places[0].operating_hours[1].open_time").value("09:00"))
-                .andExpect(jsonPath("$.places[0].operating_hours[1].close_time").value("22:00"));
+                .andExpect(jsonPath("$.places[0].operatingHours[1].openTime").value("09:00"))
+                .andExpect(jsonPath("$.places[0].operatingHours[1].closeTime").value("22:00"));
     }
 
     @Test
@@ -209,7 +209,7 @@ class PlaceListControllerTest {
     @ValueSource(
             strings = {
                 "", // 좌표, 동네 둘 다 없음
-                "lat=37.5445&lng=127.0559&neighborhood_id=1", // 둘 다 있음
+                "lat=37.5445&lng=127.0559&neighborhoodId=1", // 둘 다 있음
                 "lat=37.5445", // lat만
                 "lng=127.0559", // lng만
                 "lat=37.5445&lng=127.0559&radius=700", // 허용되지 않은 radius
@@ -226,7 +226,7 @@ class PlaceListControllerTest {
     @Test
     @DisplayName("없는 동네로 조회하면 404를 응답한다")
     void neighborhoodNotFound() throws Exception {
-        mockMvc.perform(get("/places").param("neighborhood_id", String.valueOf(Long.MAX_VALUE)))
+        mockMvc.perform(get("/places").param("neighborhoodId", String.valueOf(Long.MAX_VALUE)))
                 .andExpect(status().isNotFound())
                 .andExpect(
                         jsonPath("$.code")

@@ -69,10 +69,10 @@ class NeighborhoodControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(seongsu.getId()))
-                .andExpect(jsonPath("$[0].station_name").value("성수"))
+                .andExpect(jsonPath("$[0].stationName").value("성수"))
                 .andExpect(jsonPath("$[0].lat").value(37.5446))
                 .andExpect(jsonPath("$[0].lng").value(127.0559))
-                .andExpect(jsonPath("$[0].open_place_count").value(1));
+                .andExpect(jsonPath("$[0].openPlaceCount").value(1));
     }
 
     @Test
@@ -111,7 +111,7 @@ class NeighborhoodControllerTest {
 
         mockMvc.perform(get("/neighborhoods"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].open_place_count").value(1));
+                .andExpect(jsonPath("$[0].openPlaceCount").value(1));
     }
 
     @Test
@@ -128,9 +128,9 @@ class NeighborhoodControllerTest {
         mockMvc.perform(get("/neighborhoods"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(seongsu.getId()))
-                .andExpect(jsonPath("$[0].open_place_count").value(2))
+                .andExpect(jsonPath("$[0].openPlaceCount").value(2))
                 .andExpect(jsonPath("$[1].id").value(gangnam.getId()))
-                .andExpect(jsonPath("$[1].open_place_count").value(1));
+                .andExpect(jsonPath("$[1].openPlaceCount").value(1));
     }
 
     @Test
@@ -141,7 +141,7 @@ class NeighborhoodControllerTest {
         mockMvc.perform(get("/neighborhoods"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].open_place_count").value(0));
+                .andExpect(jsonPath("$[0].openPlaceCount").value(0));
     }
 
     private Neighborhood saveNeighborhood(String stationName, BigDecimal lat, BigDecimal lng) {

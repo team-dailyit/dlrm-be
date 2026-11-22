@@ -92,30 +92,28 @@ class PlaceControllerTest {
                 // 기본 필드
                 .andExpect(jsonPath("$.id").value(place.getId()))
                 .andExpect(jsonPath("$.name").value("들름 팝업스토어"))
-                .andExpect(jsonPath("$.thumbnail_url").value("https://dlrm.test/places/popup.png"))
+                .andExpect(jsonPath("$.thumbnailUrl").value("https://dlrm.test/places/popup.png"))
                 .andExpect(jsonPath("$.address").value("서울시 성동구 성수이로"))
                 .andExpect(jsonPath("$.lat").value(37.5445))
                 .andExpect(jsonPath("$.lng").value(127.0559))
-                .andExpect(jsonPath("$.sns_url").value("https://instagram.com/dlrm_popup"))
-                .andExpect(jsonPath("$.is_open_now").value(true))
-                .andExpect(jsonPath("$.homepage_url").value(nullValue()))
-                .andExpect(jsonPath("$.category_id").value(place.getCategory().getId()))
+                .andExpect(jsonPath("$.snsUrl").value("https://instagram.com/dlrm_popup"))
+                .andExpect(jsonPath("$.isOpenNow").value(true))
+                .andExpect(jsonPath("$.homepageUrl").value(nullValue()))
+                .andExpect(jsonPath("$.categoryId").value(place.getCategory().getId()))
                 // 운영 시간
-                .andExpect(jsonPath("$.operating_hours.length()").value(7))
+                .andExpect(jsonPath("$.operatingHours.length()").value(7))
                 .andExpect(
-                        jsonPath("$.operating_hours[*].day_of_week")
+                        jsonPath("$.operatingHours[*].dayOfWeek")
                                 .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
                 .andExpect(
-                        jsonPath("$.operating_hours[*].is_day_off")
+                        jsonPath("$.operatingHours[*].isDayOff")
                                 .value(contains(true, false, false, false, false, false, false)))
                 // 월
-                .andExpect(jsonPath("$.operating_hours[0].open_time").value(nullValue()))
-                .andExpect(jsonPath("$.operating_hours[0].close_time").value(nullValue()))
+                .andExpect(jsonPath("$.operatingHours[0].openTime").value(nullValue()))
+                .andExpect(jsonPath("$.operatingHours[0].closeTime").value(nullValue()))
                 // 화~일
-                .andExpect(
-                        jsonPath("$.operating_hours[1:].open_time").value(everyItem(is("09:00"))))
-                .andExpect(
-                        jsonPath("$.operating_hours[1:].close_time").value(everyItem(is("22:00"))))
+                .andExpect(jsonPath("$.operatingHours[1:].openTime").value(everyItem(is("09:00"))))
+                .andExpect(jsonPath("$.operatingHours[1:].closeTime").value(everyItem(is("22:00"))))
                 // 키워드
                 .andExpect(jsonPath("$.keywords.length()").value(2))
                 .andExpect(jsonPath("$.keywords[0].id").value(family.getId()))
@@ -148,22 +146,21 @@ class PlaceControllerTest {
 
         mockMvc.perform(get("/places/{id}", place.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.operating_hours", hasSize(7)))
+                .andExpect(jsonPath("$.operatingHours", hasSize(7)))
                 .andExpect(
-                        jsonPath("$.operating_hours[*].day_of_week")
+                        jsonPath("$.operatingHours[*].dayOfWeek")
                                 .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
                 .andExpect(
-                        jsonPath("$.operating_hours[*].is_day_off")
+                        jsonPath("$.operatingHours[*].isDayOff")
                                 .value(contains(false, false, false, false, false, true, true)))
                 // 토~일
+                .andExpect(jsonPath("$.operatingHours[5:].openTime").value(everyItem(nullValue())))
                 .andExpect(
-                        jsonPath("$.operating_hours[5:].open_time").value(everyItem(nullValue())))
-                .andExpect(
-                        jsonPath("$.operating_hours[5:].close_time").value(everyItem(nullValue())));
+                        jsonPath("$.operatingHours[5:].closeTime").value(everyItem(nullValue())));
     }
 
     @Test
-    @DisplayName("지금 영업 중이 아니면 is_open_now를 false로 응답한다")
+    @DisplayName("지금 영업 중이 아니면 isOpenNow를 false로 응답한다")
     void notOpenNow() throws Exception {
         Place place = buildPlace(PlaceStatus.ACTIVE);
         // 지금(화요일 15:00)보다 일찍 마감
@@ -181,7 +178,7 @@ class PlaceControllerTest {
 
         mockMvc.perform(get("/places/{id}", place.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.is_open_now").value(false));
+                .andExpect(jsonPath("$.isOpenNow").value(false));
     }
 
     @Test
