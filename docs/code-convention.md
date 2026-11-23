@@ -2,16 +2,12 @@
 
 ## API 이름 규칙
 
-- 요청·응답 JSON 키와 쿼리 파라미터는 snake_case로 쓴다. 자바 코드의 이름은 camelCase로 쓴다.
-- JSON 키는 전역 설정으로 변환되므로 따로 지정하지 않는다.
-- 쿼리 파라미터는 이름을 직접 지정한다.
-    - 하나씩 받을 때: `@RequestParam("snake_case")`
-    - 객체로 묶어 받을 때: `public record`의 각 필드에 `@BindParam("snake_case")`를 붙이고, 컨트롤러 파라미터에 `@ParameterObject`를 붙인다.
+- 요청·응답 JSON 키와 쿼리 파라미터는 camelCase로 쓴다.
+- JSON 키와 쿼리 파라미터 이름은 자바 필드·파라미터 이름을 그대로 쓰고, 따로 지정하지 않는다.
+- 쿼리 파라미터를 객체로 묶어 받을 때는 `public record`로 만들고, 컨트롤러 파라미터에 `@ParameterObject`를 붙인다.
 
 ```java
-public record NearbyPlaceQuery(
-        @BindParam("neighborhood_id") Long neighborhoodId,
-        @BindParam("station_name") String stationName) {}
+public record NearbyPlaceQuery(Long neighborhoodId, String stationName) {}
 
 @GetMapping("/places")
 public List<PlaceResponse> getPlaces(@ParameterObject NearbyPlaceQuery query) { ... }

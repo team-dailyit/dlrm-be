@@ -57,7 +57,7 @@ public class PlaceController {
             summary = "장소 목록 조회",
             description =
                     "기준점에서 반경 안에 있는 운영 중(ACTIVE)인 장소를 가까운 순으로 반환한다."
-                            + " 기준점은 GPS 좌표(lat, lng)나 동네(neighborhood_id) 중 하나로 보낸다.")
+                            + " 기준점은 GPS 좌표(lat, lng)나 동네(neighborhoodId) 중 하나로 보낸다.")
     @ApiResponse(responseCode = "200", description = "조회 성공")
     @ApiResponse(
             responseCode = "400",
@@ -75,7 +75,7 @@ public class PlaceController {
                                                     """)))
     @ApiResponse(
             responseCode = "404",
-            description = "neighborhood_id에 해당하는 동네가 없음",
+            description = "neighborhoodId에 해당하는 동네가 없음",
             content =
                     @Content(
                             schema = @Schema(implementation = ErrorResponse.class),
