@@ -1,0 +1,15 @@
+# EC2 운영용 (로컬 개발 DB는 루트의 compose.yaml). 배포 때 ~/dlrm/로 복사된다
+services:
+  service:
+    # 같은 폴더의 .env에 배포 워크플로가 커밋 SHA 태그를 기록한다
+    image: ${SERVICE_IMAGE:?SERVICE_IMAGE is not set in .env}
+    container_name: dlrm-service
+    restart: always
+    # 비밀값은 EC2에만 둔다 (키 목록은 레포의 .env.example)
+    env_file: service.env
+    ports:
+      - "8080:8080"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
