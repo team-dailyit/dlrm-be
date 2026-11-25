@@ -1,0 +1,238 @@
+package com.dailyit.dlrm.service.place;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.dailyit.dlrm.core.domain.Category;
+import com.dailyit.dlrm.core.domain.Keyword;
+import com.dailyit.dlrm.core.domain.Neighborhood;
+import com.dailyit.dlrm.core.domain.OperatingHour;
+import com.dailyit.dlrm.core.domain.Place;
+import com.dailyit.dlrm.core.domain.type.DayOfWeekCode;
+import com.dailyit.dlrm.core.domain.type.PlaceStatus;
+import com.dailyit.dlrm.core.domain.type.ScheduleType;
+import com.dailyit.dlrm.core.domain.type.StatusChangeType;
+import com.dailyit.dlrm.core.repository.CategoryRepository;
+import com.dailyit.dlrm.core.repository.KeywordRepository;
+import com.dailyit.dlrm.core.repository.NeighborhoodRepository;
+import com.dailyit.dlrm.core.repository.PlaceRepository;
+import com.dailyit.dlrm.core.testsupport.FixedClockTestConfig;
+import com.dailyit.dlrm.core.testsupport.PostgresTestContainer;
+import jakarta.persistence.EntityManager;
+import java.math.BigDecimal;
+import java.time.LocalTime;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+@Import({PostgresTestContainer.class, FixedClockTestConfig.class})
+@Transactional
+@SpringBootTest
+@AutoConfigureMockMvc
+class PlaceControllerTest {
+
+    @Autowired MockMvc mockMvc;
+
+    @Autowired PlaceRepository placeRepository;
+
+    @Autowired CategoryRepository categoryRepository;
+
+    @Autowired NeighborhoodRepository neighborhoodRepository;
+
+    @Autowired KeywordRepository keywordRepository;
+
+    @Autowired EntityManager entityManager;
+
+    @Test
+    @DisplayName("장소 상세 정보를 응답한다")
+    void getPlaceDetail() throws Exception {
+        Place place = buildPlace(PlaceStatus.ACTIVE);
+
+        Keyword family = keywordRepository.save(Keyword.builder().name("가족과함께").build());
+        Keyword popup = keywordRepository.save(Keyword.builder().name("팝업스토어").build());
+
+        // 월요일 휴무, 화~일 09:00~22:00
+        for (DayOfWeekCode day : DayOfWeekCode.values()) {
+            if (day == DayOfWeekCode.MON) {
+                place.addOperatingHour(
+                        OperatingHour.builder().dayOfWeek(day).isDayOff(true).build());
+            } else {
+                place.addOperatingHour(
+                        OperatingHour.builder()
+                                .dayOfWeek(day)
+                                .isDayOff(false)
+                                .openTime(LocalTime.of(9, 0))
+                                .closeTime(LocalTime.of(22, 0))
+                                .build());
+            }
+        }
+        place.getKeywords().add(popup);
+        place.getKeywords().add(family);
+        placeRepository.save(place);
+
+        // 메모리에 남은 객체가 아니라 DB에서 다시 읽은 값으로 응답하는지 확인한다
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(get("/places/{id}", place.getId()))
+                .andExpect(status().isOk())
+                // 기본 필드
+                .andExpect(jsonPath("$.id").value(place.getId()))
+                .andExpect(jsonPath("$.name").value("들름 팝업스토어"))
+                .andExpect(jsonPath("$.thumbnailUrl").value("https://dlrm.test/places/popup.png"))
+                .andExpect(jsonPath("$.address").value("서울시 성동구 성수이로"))
+                .andExpect(jsonPath("$.lat").value(37.5445))
+                .andExpect(jsonPath("$.lng").value(127.0559))
+                .andExpect(jsonPath("$.snsUrl").value("https://instagram.com/dlrm_popup"))
+                .andExpect(jsonPath("$.isOpenNow").value(true))
+                .andExpect(jsonPath("$.homepageUrl").value(nullValue()))
+                .andExpect(jsonPath("$.categoryId").value(place.getCategory().getId()))
+                // 운영 시간
+                .andExpect(jsonPath("$.operatingHours.length()").value(7))
+                .andExpect(
+                        jsonPath("$.operatingHours[*].dayOfWeek")
+                                .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
+                .andExpect(
+                        jsonPath("$.operatingHours[*].isDayOff")
+                                .value(contains(true, false, false, false, false, false, false)))
+                // 월
+                .andExpect(jsonPath("$.operatingHours[0].openTime").value(nullValue()))
+                .andExpect(jsonPath("$.operatingHours[0].closeTime").value(nullValue()))
+                // 화~일
+                .andExpect(jsonPath("$.operatingHours[1:].openTime").value(everyItem(is("09:00"))))
+                .andExpect(jsonPath("$.operatingHours[1:].closeTime").value(everyItem(is("22:00"))))
+                // 키워드
+                .andExpect(jsonPath("$.keywords.length()").value(2))
+                .andExpect(jsonPath("$.keywords[0].id").value(family.getId()))
+                .andExpect(jsonPath("$.keywords[1].id").value(popup.getId()))
+                .andExpect(jsonPath("$.keywords[*].name").value(contains("가족과함께", "팝업스토어")));
+    }
+
+    @Test
+    @DisplayName("등록되지 않은 요일은 휴무로 채워 요일 순으로 7개를 응답한다")
+    void fillMissingDaysAsClosed() throws Exception {
+        Place place = buildPlace(PlaceStatus.ACTIVE);
+
+        // 영업시간이 월~금만 존재
+        for (DayOfWeekCode day : DayOfWeekCode.values()) {
+            if (day == DayOfWeekCode.SAT || day == DayOfWeekCode.SUN) {
+                continue;
+            }
+            place.addOperatingHour(
+                    OperatingHour.builder()
+                            .dayOfWeek(day)
+                            .isDayOff(false)
+                            .openTime(LocalTime.of(9, 0))
+                            .closeTime(LocalTime.of(22, 0))
+                            .build());
+        }
+        placeRepository.save(place);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(get("/places/{id}", place.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.operatingHours", hasSize(7)))
+                .andExpect(
+                        jsonPath("$.operatingHours[*].dayOfWeek")
+                                .value(contains("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")))
+                .andExpect(
+                        jsonPath("$.operatingHours[*].isDayOff")
+                                .value(contains(false, false, false, false, false, true, true)))
+                // 토~일
+                .andExpect(jsonPath("$.operatingHours[5:].openTime").value(everyItem(nullValue())))
+                .andExpect(
+                        jsonPath("$.operatingHours[5:].closeTime").value(everyItem(nullValue())));
+    }
+
+    @Test
+    @DisplayName("지금 영업 중이 아니면 isOpenNow를 false로 응답한다")
+    void notOpenNow() throws Exception {
+        Place place = buildPlace(PlaceStatus.ACTIVE);
+        // 지금(화요일 15:00)보다 일찍 마감
+        place.addOperatingHour(
+                OperatingHour.builder()
+                        .dayOfWeek(DayOfWeekCode.TUE)
+                        .isDayOff(false)
+                        .openTime(LocalTime.of(9, 0))
+                        .closeTime(LocalTime.of(13, 0))
+                        .build());
+        placeRepository.save(place);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(get("/places/{id}", place.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isOpenNow").value(false));
+    }
+
+    @Test
+    @DisplayName("없는 장소를 조회하면 404를 응답한다")
+    void notFound() throws Exception {
+        mockMvc.perform(get("/places/{id}", Long.MAX_VALUE))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("PLACE_NOT_FOUND"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = PlaceStatus.class,
+            names = {"SCHEDULED", "INACTIVE", "PENDING"})
+    @DisplayName("운영 중이 아닌 장소를 조회하면 404를 응답한다")
+    void notActive(PlaceStatus status) throws Exception {
+        Place place = buildPlace(status);
+        placeRepository.save(place);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(get("/places/{id}", place.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("PLACE_NOT_FOUND"));
+    }
+
+    private Place buildPlace(PlaceStatus status) {
+        Category category =
+                categoryRepository.save(
+                        Category.builder()
+                                .name("팝업")
+                                .iconUrl("https://dlrm.test/icons/popup.png")
+                                .build());
+        Neighborhood neighborhood =
+                neighborhoodRepository.save(
+                        Neighborhood.builder()
+                                .stationName("성수")
+                                .lat(new BigDecimal("37.5446"))
+                                .lng(new BigDecimal("127.0559"))
+                                .build());
+
+        return Place.builder()
+                .category(category)
+                .neighborhood(neighborhood)
+                .name("들름 팝업스토어")
+                .thumbnailUrl("https://dlrm.test/places/popup.png")
+                .address("서울시 성동구 성수이로")
+                .lat(new BigDecimal("37.5445"))
+                .lng(new BigDecimal("127.0559"))
+                .snsUrl("https://instagram.com/dlrm_popup")
+                .scheduleType(ScheduleType.ALWAYS)
+                .status(status)
+                .statusChangeType(StatusChangeType.MANUAL)
+                .build();
+    }
+}

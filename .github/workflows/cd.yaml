@@ -1,0 +1,97 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # OIDC로 AWS 역할을 받는 데 필요
+
+jobs:
+  deploy:
+    # 수동 실행 때 다른 브랜치를 고르면 테스트를 거치지 않은 코드가 배포되므로 main만 허용
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      # 공개 레포라 빌드 기록·요약에 AWS 계정 번호가 남지 않게 한다
+      DOCKER_BUILD_RECORD_UPLOAD: false
+      DOCKER_BUILD_SUMMARY: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-2
+          mask-aws-account-id: true
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 이미지 이름 정하기
+        run: echo "IMAGE=${{ steps.ecr.outputs.registry }}/dlrm-service" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-buildx-action@v4
+
+      # 테스트는 main으로 가는 PR의 CI에서 이미 실행된다
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: SSH 접속 준비
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # 공개 레포라 로그에 서버 주소가 찍히지 않게 출력을 버린다
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: compose 파일 복사
+        env:
+          EC2_TARGET: ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}
+        run: scp -i ~/.ssh/deploy_key deploy/compose.yaml "$EC2_TARGET:~/dlrm/compose.yaml"
+
+      - name: 새 이미지로 교체 후 상태 확인
+        env:
+          EC2_TARGET: ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}
+          SERVICE_IMAGE: ${{ env.IMAGE }}:${{ github.sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key "$EC2_TARGET" "SERVICE_IMAGE='$SERVICE_IMAGE' bash -s" <<'SCRIPT'
+          set -euo pipefail
+          cd ~/dlrm
+
+          # 롤백: 이 파일의 태그를 이전 커밋 SHA로 바꾸고 docker compose up -d service
+          echo "SERVICE_IMAGE=${SERVICE_IMAGE}" > .env
+
+          docker compose pull service
+          docker compose up -d service
+
+          for i in $(seq 1 30); do
+            if curl -fs http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
+              echo "health check 통과"
+              docker image prune -af --filter "until=168h" || true
+              exit 0
+            fi
+            sleep 3
+          done
+
+          # 공개 레포라 앱 로그는 출력하지 않는다
+          echo "health check 실패: EC2에서 'docker compose logs service'로 확인하세요"
+          exit 1
+          SCRIPT
