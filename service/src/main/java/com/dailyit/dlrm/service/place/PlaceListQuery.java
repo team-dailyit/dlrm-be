@@ -26,17 +26,17 @@ public record PlaceListQuery(
                         example = "1")
                 Long neighborhoodId,
         @Parameter(
-                        description = "반경(m). 300, 500, 1000, 2000 중 하나",
+                        description = "반경(m). 300, 500, 1000 중 하나",
                         example = "500",
                         schema =
                                 @Schema(
                                         type = "integer",
-                                        allowableValues = {"300", "500", "1000", "2000"},
+                                        allowableValues = {"300", "500", "1000"},
                                         defaultValue = "500"))
                 Integer radius) {
 
     private static final int DEFAULT_RADIUS = 500;
-    private static final Set<Integer> ALLOWED_RADII = Set.of(300, 500, 1000, 2000);
+    private static final Set<Integer> ALLOWED_RADII = Set.of(300, 500, 1000);
 
     public PlaceListQuery {
         if (radius == null) {
