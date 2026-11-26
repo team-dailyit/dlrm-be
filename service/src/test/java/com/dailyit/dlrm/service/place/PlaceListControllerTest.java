@@ -213,6 +213,7 @@ class PlaceListControllerTest {
                 "lat=37.5445", // lat만
                 "lng=127.0559", // lng만
                 "lat=37.5445&lng=127.0559&radius=700", // 허용되지 않은 radius
+                "lat=37.5445&lng=127.0559&radius=2000", // 허용되지 않은 radius (예전 허용값)
                 "lat=90.1&lng=127.0559", // 위도 범위 밖
                 "lat=37.5445&lng=-180.1", // 경도 범위 밖
                 "lat=NaN&lng=127.0559", // 숫자가 아닌 좌표
